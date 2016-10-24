@@ -30,7 +30,7 @@ gulp.task('injectSnippet', function(){
 
 /* inject:helloType start */
 
-// your snippet will injected into this field 
+// your snippet will be injected into this field 
 
 /* inject:helloType end */
 
@@ -66,7 +66,7 @@ Description: `A string you can use to distinguish the entry your snippet inject 
 
 ### inject(filePath, [options])
 
-You can use a exported function named inject via:
+You can use a exported function named ***inject*** via:
 
 ```javascript
 
@@ -78,28 +78,3 @@ inject('path/to/file.js', {
 })
 
 ```
-
-#### filePath
-Type: `String`
-
-required: **`true`**
-
-#### options
-Type: `Object or [Object]`
-
-##### options.code
-
-Type: `String`  
-
-Default: `''`
-
-Description: `The code snippet you want to inject into the target js file`
-
-#### options.type
-
-Type: `String`
-
-Default: `''`
-
-Description: `A string you can use to distinguish the entry your snippet inject into `
-
