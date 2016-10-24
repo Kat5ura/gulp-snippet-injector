@@ -14,7 +14,7 @@ function smartInject(str, snippet, type) {
 
     snippet = startTag + '\n' + (snippet || '') + '\n' + endTag
 
-    var reg = new RegExp('\\/\\*\\s*inject'+ type +'\\s*start\\s*\\*\\/\\s*[\\s\\S]*\\s*\\/\\*\\s*inject'+ type +'\\s*end\\s*\\*\\/', 'mg')
+    var reg = new RegExp('\\/\\*\\s*inject' + type + '\\s*start\\s*\\*\\/\\s*[\\s\\S]*\\s*\\/\\*\\s*inject' + type + '\\s*end\\s*\\*\\/', 'mg')
 
     console.log(type + ' ' + reg.test(str))
 
@@ -29,15 +29,9 @@ function smartInject(str, snippet, type) {
         stripTags: true,
         delimiters: [startTag, endTag]
     })
-
 }
 
-
 module.exports = function (options) {
-
-    var code = options.code || '',
-        type = options.type || ''
-
     return through.obj(function (file, enc, cb) {
         if (file.isNull()) {
             cb(null, file)
@@ -45,39 +39,53 @@ module.exports = function (options) {
         }
 
         if (file.isStream()) {
-            cb(new gutil.PluginError('gulp-inject-snippet', 'Streaming not supported'))
+            cb(new gutil.PluginError('gulp-snippet-injector', 'Streaming not supported'))
             return
         }
 
-        var newContents = beautify(smartInject(file.contents.toString(), code, type), {})
-        file.contents = new Buffer(newContents)
+        var tempContents = file.contents.toString();
+
+        if (Array.isArray(options)) {
+            options.forEach(function (option) {
+                tempContents = smartInject(tempContents, option.code || '', option.type || '')
+            })
+        } else {
+            tempContents = smartInject(tempContents, options.code || '', options.type || '')
+        }
+
+        tempContents = beautify(tempContents, {indent_size: 2})
+
+        file.contents = new Buffer(tempContents)
         cb(null, file)
     })
 }
 
-function inject (filePath, opts) {
-    var contents = fs.readFileSync(filePath, 'utf-8'),
-        temp = contents;
-
-    if(!Array.isArray(opts)){
-        console.log('Second argument should be an array!!')
+function inject(filePath, opts) {
+    if (!filePath) {
+        console.log('file path is required!!')
         return
     }
 
-    opts.forEach(function (opt) {
-        temp = smartInject(temp, opt.code || '', opt.type || '');
-    })
+    var contents = fs.readFileSync(filePath, 'utf-8'),
+        temp = contents;
+
+    if (!Array.isArray(opts)) {
+        temp = smartInject(temp, opts.code || '', opts.type || '');
+    } else {
+        opts.forEach(function (opt) {
+            temp = smartInject(temp, opt.code || '', opt.type || '');
+        })
+    }
 
     temp = beautify(temp, {indent_size: 2})
 
     fs.writeFile(filePath, temp, 'utf-8', function (err) {
         if (err) {
             console.log(err)
-        }else {
+        } else {
             console.info(filePath + ' successfully proceeded')
         }
     })
-
 }
 
 module.exports.inject = inject
