@@ -1,4 +1,5 @@
 # gulp-replace
+
 > A js snippet injector plugin for gulp
 
 ## Usage
@@ -53,7 +54,7 @@ Type: `String`
 
 Default: `''`
 
-Description: `The code snippet you want to inject into the target js file`
+Description: `The code snippet you want to inject into the target js file.`
 
 #### options.type
 
@@ -61,7 +62,7 @@ Type: `String`
 
 Default: `''`
 
-Description: `A string you can use to distinguish the entry your snippet inject into `
+Description: `A string you can use to distinguish the entry where your snippet inject into. `
 
 
 ### inject(filePath, [options])
@@ -78,3 +79,7 @@ inject('path/to/file.js', {
 })
 
 ```
+
+## License
+
+MIT
