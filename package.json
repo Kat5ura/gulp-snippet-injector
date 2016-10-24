@@ -1,0 +1,20 @@
+{
+  "name": "gulp-snippet-injector",
+  "version": "0.0.1",
+  "description": "This is a gulp-injector to inject any snippet into a js file, you just need to specify the place you want to inject your snippet into  ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "gulpplugin"
+  ],
+  "author": "Kat5ura",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp-util": "^3.0.7",
+    "inject-snippet": "^0.3.0",
+    "js-beautify": "^1.6.4",
+    "through2": "^2.0.1"
+  }
+}
