@@ -2,3 +2,4 @@
 examples/
 test/
 .idea/
+npm-debug.log
