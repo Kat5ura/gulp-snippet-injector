@@ -7,21 +7,30 @@ var through = require('through2')
 var fs = require('fs')
 var beautify = require('js-beautify')
 
-function smartInject(str, snippet, type) {
+function smartInject(str, snippet, type, mode) {
     type = type ? ':' + type : ''
     var startTag = '/* inject' + type + ' start */',
         endTag = '/* inject' + type + ' end */'
 
-    snippet = startTag + '\n' + (snippet || '') + '\n' + endTag
+    switch (mode) {
+        case 'append':
+            snippet = (snippet || '') + '\n' + startTag + '\n' + endTag
+            break;
+        case 'prepend':
+            snippet = startTag + '\n' + endTag + '\n' + (snippet || '')
+            break;
+        default:
+            snippet = startTag + '\n' + (snippet || '') + '\n' + endTag
+    }
 
     var reg = new RegExp('\\/\\*\\s*inject' + type + '\\s*start\\s*\\*\\/\\s*[\\s\\S]*\\s*\\/\\*\\s*inject' + type + '\\s*end\\s*\\*\\/', 'mg')
 
     console.log(type + ' ' + reg.test(str))
 
-    str = str.replace(reg, function (word) {
+    str = str.replace(reg, function () {
         return `${startTag}
       snippet
-    ${endTag}
+  ${endTag}
     `
     })
 
@@ -47,10 +56,10 @@ module.exports = function (options) {
 
         if (Array.isArray(options)) {
             options.forEach(function (option) {
-                tempContents = smartInject(tempContents, option.code || '', option.type || '')
+                tempContents = smartInject(tempContents, option.code || '', option.type || '', options.mode)
             })
         } else {
-            tempContents = smartInject(tempContents, options.code || '', options.type || '')
+            tempContents = smartInject(tempContents, options.code || '', options.type || '', options.mode)
         }
 
         tempContents = beautify(tempContents, {indent_size: 2})
@@ -60,7 +69,7 @@ module.exports = function (options) {
     })
 }
 
-function inject(filePath, opts) {
+function inject(filePath, opts, distPath) {
     if (!filePath) {
         console.log('file path is required!!')
         return
@@ -70,16 +79,16 @@ function inject(filePath, opts) {
         temp = contents;
 
     if (!Array.isArray(opts)) {
-        temp = smartInject(temp, opts.code || '', opts.type || '');
+        temp = smartInject(temp, opts.code || '', opts.type || '', opts.mode);
     } else {
         opts.forEach(function (opt) {
-            temp = smartInject(temp, opt.code || '', opt.type || '');
+            temp = smartInject(temp, opt.code || '', opt.type || '', opt.mode);
         })
     }
 
     temp = beautify(temp, {indent_size: 2})
 
-    fs.writeFile(filePath, temp, 'utf-8', function (err) {
+    fs.writeFile(distPath || filePath, temp, 'utf-8', function (err) {
         if (err) {
             console.log(err)
         } else {

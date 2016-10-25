@@ -4,7 +4,7 @@
   "description": "This is a gulp-injector to inject any snippet into a js file, you just need to specify the place you want to inject your snippet into.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node examples/test.js"
   },
   "keywords": [
     "gulpplugin"
