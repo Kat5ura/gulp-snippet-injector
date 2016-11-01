@@ -7,10 +7,10 @@ var through = require('through2')
 var fs = require('fs')
 var beautify = require('js-beautify')
 
-function smartInject(str, snippet, type, mode) {
-    type = type ? ':' + type : ''
-    var startTag = '/* inject' + type + ' start */',
-        endTag = '/* inject' + type + ' end */'
+function smartInject(str, snippet, entry, mode) {
+    entry = entry ? ':' + entry : ''
+    var startTag = '/* inject' + entry + ' start */',
+        endTag = '/* inject' + entry + ' end */'
 
     switch (mode) {
         case 'append':
@@ -23,9 +23,11 @@ function smartInject(str, snippet, type, mode) {
             snippet = startTag + '\n' + (snippet || '') + '\n' + endTag
     }
 
-    var reg = new RegExp('\\/\\*\\s*inject' + type + '\\s*start\\s*\\*\\/\\s*[\\s\\S]*\\s*\\/\\*\\s*inject' + type + '\\s*end\\s*\\*\\/', 'mg')
+    var reg = new RegExp('\\/\\*\\s*inject' + entry + '\\s*start\\s*\\*\\/\\s*[\\s\\S]*\\s*\\/\\*\\s*inject' + entry + '\\s*end\\s*\\*\\/', 'mg')
 
-    console.log(type + ' ' + reg.test(str))
+    if(!reg.test(str)){
+        console.log('Inject failed...')
+    }
 
     str = str.replace(reg, function () {
         return `${startTag}
@@ -56,10 +58,10 @@ module.exports = function (options) {
 
         if (Array.isArray(options)) {
             options.forEach(function (option) {
-                tempContents = smartInject(tempContents, option.code || '', option.type || '', options.mode)
+                tempContents = smartInject(tempContents, option.code || '', option.entry || '', options.mode)
             })
         } else {
-            tempContents = smartInject(tempContents, options.code || '', options.type || '', options.mode)
+            tempContents = smartInject(tempContents, options.code || '', options.entry || '', options.mode)
         }
 
         tempContents = beautify(tempContents, {indent_size: 2})
@@ -79,10 +81,10 @@ function inject(filePath, opts, distPath) {
         temp = contents;
 
     if (!Array.isArray(opts)) {
-        temp = smartInject(temp, opts.code || '', opts.type || '', opts.mode);
+        temp = smartInject(temp, opts.code || '', opts.entry || '', opts.mode);
     } else {
         opts.forEach(function (opt) {
-            temp = smartInject(temp, opt.code || '', opt.type || '', opt.mode);
+            temp = smartInject(temp, opt.code || '', opt.entry || '', opt.mode);
         })
     }
 
@@ -92,7 +94,7 @@ function inject(filePath, opts, distPath) {
         if (err) {
             console.log(err)
         } else {
-            console.info(filePath + ' successfully proceeded')
+            console.info(filePath + ' done.')
         }
     })
 }

@@ -20,20 +20,37 @@ gulp.task('injectSnippet', function(){
   gulp.src(['file.js'])
     .pipe(injector({
         code: 'console.log("Hello world");',
-        type: 'helloType'
+        entry: 'helloType'
     })
     .pipe(gulp.dest('build/file.js'));
 });
+
+gulp.task('injectAppend', function(){
+  gulp.src(['file.js'])
+    .pipe(injector({
+        code: 'console.log("Hello world");',
+        entry: 'appendEntry',
+        mode: 'append'
+    })
+    .pipe(gulp.dest('build/file.js'));
+});
+
 ```
 ### file.js
 ```javascript
 // ..... some code
 
-/* inject:helloType start */
+/* inject:helloEntry start */
 
 // your snippet will be injected into this field 
 
-/* inject:helloType end */
+/* inject:helloEntry end */
+
+/* inject:appendEntry start */
+
+/* inject:appendEntry end */
+
+// your snippet will be injected into this field 
 
 // ..... some code
 ```
@@ -56,7 +73,7 @@ Default: `''`
 
 Description: `The code snippet you want to inject into the target js file.`
 
-#### options.type
+#### options.entry
 
 Type: `String`
 
@@ -64,8 +81,15 @@ Default: `''`
 
 Description: `A string you can use to distinguish the entry where your snippet inject into. `
 
+#### options.mode
 
-### inject(filePath, [options])
+Type: `String` | `inside / append / prepend`
+
+Default: `''`
+
+Description: `A string you can use to specify a mode, code can be appended or prepended to the entry, default is inside the entry`
+
+### inject(filePath, [options], disPath)
 
 You can use a exported function named ***inject*** via:
 
@@ -75,7 +99,7 @@ var inject = require('gulp-snippet-inject').inject
 
 inject('path/to/file.js', {
     code: 'console.log("Hello world!")',
-    type: 'helloType'
+    entry: 'helloEntry'
 })
 
 ```
